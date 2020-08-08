@@ -3,70 +3,56 @@ package com.example.ProyectoISW.controllers;
 //import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 import com.example.ProyectoISW.entity.SolicitudesSillon;
-import com.example.ProyectoISW.repository.SolicitudSillonRepo;
+import com.example.ProyectoISW.services.SsillonService;
 
-@Controller
+@RestController
 @RequestMapping("/solicitudsillon")
 public class SolicitudesSillonController {
 
 	@Autowired
-	private SolicitudSillonRepo SSrepo;
+	private SsillonService SSservice;
 	
-	@GetMapping("showForm")
-	public String ShowSolicitudSForm(){
-		return "add-solicitudsillon";
-	}
-	
-	@GetMapping("list")
-	public String reservas(Model model) {
-		model.addAttribute("solicitudesS", this.SSrepo.findAll());
-		return "index";
-	}
-	
-	@PostMapping("add")
-	public String addReserva(/*@Valid*/ SolicitudesSillon solicitud, BindingResult result, Model model) {
-		if(result.hasErrors()){
-			return "add-solicitudsillon";
-		}
-		this.SSrepo.save(solicitud);
-		return "redirect:list";
-	}
-	
-	/*@GetMapping("edit/{id}")
-	public String showUpdateForm(@PathVariable("id") long id, Model model) {
-		SolicitudesPabellon solicitud = (SolicitudesPabellon) this.SPrepo.findById(id);
-		model.addAttribute("solicitudP", solicitud);
-		return "update-solicitudP";
-	}
-	
-	@PostMapping("update/{id}")
-	public String updateCar(@PathVariable("id") long id,SolicitudesPabellon solicitud, BindingResult result, Model model) {
-		if(result.hasErrors()) {
-			solicitud.setId(id);
-			return "update-solicitudP";
-		}
-		SPrepo.save(solicitud);
-		model.addAttribute("solicitudP", this.SPrepo.findAll());
-		return "index";
-	}*/
-	
-	@DeleteMapping("delete/{id}")
-	public String deleteCar(@PathVariable("id") long id, Model model) {
-		SolicitudesSillon solicitud = (SolicitudesSillon) this.SSrepo.findById(id);
-		this.SSrepo.delete(solicitud);
-		model.addAttribute("solicitudess", this.SSrepo.findAll());
-		return "index";
-	}
+	 @GetMapping("/{id}")
+	 public ResponseEntity getSolicitudS(@PathVariable Long id){
+		 SolicitudesSillon solicitud = SSservice.findSolicitudSById(id);
+	     if (solicitud != null){
+	    	 return new ResponseEntity<SolicitudesSillon>(solicitud, HttpStatus.OK);
+	     } else{
+	         return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+	     }
+	 }
 
-
+	@GetMapping("")
+	public Iterable<SolicitudesSillon> getSolicitudesS(){
+        return SSservice.listAllSolicitudesS();
+    }
+	
+	@PostMapping("")
+	public ResponseEntity<SolicitudesSillon> addSolicitudS(@RequestBody SolicitudesSillon solicitud) {
+		SSservice.saveSolicitudS(solicitud);
+        return new ResponseEntity<SolicitudesSillon>(solicitud,HttpStatus.OK);
+	}
+	
+	@DeleteMapping("/{id}")
+    public ResponseEntity deleteSolicitudS(@PathVariable Long id){
+        SolicitudesSillon solicitud = SSservice.findSolicitudSById(id);
+        if (solicitud != null){
+            SSservice.deleteSolicitudS(id);
+            return new ResponseEntity<>(true,HttpStatus.ACCEPTED);
+        } else{
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+        }
+    }
 }
