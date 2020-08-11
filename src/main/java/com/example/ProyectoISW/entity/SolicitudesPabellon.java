@@ -35,7 +35,7 @@ public class SolicitudesPabellon {
 	}
 	
 	public long getIdPaciente() {
-		return id;
+		return idPaciente;
 	}
 	
 	public void setIdPaciente(long idPaciente) {
